@@ -1,0 +1,7 @@
+# Ignore local envs & configs
+.env
+__pycache__/
+*.pyc
+.vscode/
+.idea/
+aws-mcp-env/
