@@ -19,7 +19,7 @@ pip install -r requirement.txt
 
 Set the local environment:
 $env:PYTHONPATH="src"
-$env:FASTMCP_PORT = "8085"
+$env:FASTMCP_PORT = "8000"
 
 ## 🗣️ Multilingual Support (New!)
 
