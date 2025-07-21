@@ -16,6 +16,11 @@ python -m venv aws-mcp-env
 .\aws-mcp-env\Scripts\activate
 pip install -r requirement.txt
 
+
+Set the local environment:
+$env:PYTHONPATH="src"
+$env:FASTMCP_PORT = "8085"
+
 ## 🗣️ Multilingual Support (New!)
 
 You can now interact with AWS in **Hindi or any language** using natural language!

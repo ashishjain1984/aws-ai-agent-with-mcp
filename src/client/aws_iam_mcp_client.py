@@ -1,5 +1,3 @@
-# src/client/client_test_like.py
-
 import asyncio
 import os
 from dotenv import load_dotenv
@@ -8,7 +6,23 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_groq import ChatGroq
 from langgraph.prebuilt import create_react_agent
 
+RETRY_INTERVAL = 5  # seconds
 load_dotenv()
+
+async def wait_for_server(client: MultiServerMCPClient):
+    print("🔁 Waiting for MCP server to become available...")
+    while True:
+        try:
+            tools = await client.get_tools()
+            print("✅ MCP Tools loaded from server:")
+            for t in tools:
+                args = t.args_schema.get("properties", {})
+                print(f" - {t.name} ({', '.join(args.keys()) if args else 'no args'})")
+            return tools
+        except Exception as e:
+            print(f"⚠️ MCP server not ready yet ({e.__class__.__name__})... retrying in {RETRY_INTERVAL}s")
+            await asyncio.sleep(RETRY_INTERVAL)
+
 
 async def main():
     client = MultiServerMCPClient(
@@ -22,12 +36,8 @@ async def main():
 
     print("\n🤖 Agent is getting ready... just a second:")
 
-    tools = await client.get_tools()
+    tools = await wait_for_server(client)
     print("\n✅ MCP Tools loaded from server:")
-
-    for t in tools:
-        args = t.args_schema.get("properties", {})
-        print(f" - {t.name} ({', '.join(args.keys()) if args else 'no args'})")
 
 
     api_key = os.getenv("GROQ_API_KEY")
@@ -42,7 +52,7 @@ async def main():
 
     while True:
         q = input("🦁 Ashish: ").strip()
-        if q.lower() == "exit":
+        if q.lower() == "exit" or "bye":
             break
         if q:
             response = await agent.ainvoke({"messages": [{"role": "user", "content": q}]})
